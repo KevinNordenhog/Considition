@@ -1,6 +1,7 @@
 from api import API
 import random
 import sys
+from queue import *
 
 # TODO : Insert your API-key here
 _api_key = "bdf45aba-bdf2-49fe-b5a2-0a29e8758f63"
@@ -20,6 +21,7 @@ def solution(game_id):
         current_x_pos = current_player["xPos"]
         winPos = findWin(tiles)
         print(winPos)
+        a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
         #print(tiles[current_y_pos][current_x_pos])
         #print(current_x_pos)
         #print(current_y_pos)
@@ -61,8 +63,8 @@ def main():
         readied_game = _api.try_ready_for_game(game_id)
         if readied_game is not None:
             print("Joined and readied! Solving...")
-            #solution(game_id)
-            print (_api.get_game(game_id)["gameState"]["tileInfo"])#[0][5])
+            solution(game_id)
+            #print (_api.get_game(game_id)["gameState"]["tileInfo"])#[0][5])
 
     else:
         game_id = sys.argv[1]
