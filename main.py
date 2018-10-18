@@ -3,7 +3,7 @@ import random
 import sys
 
 #TODO : Insert your API-key here
-_api_key = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+_api_key = "bdf45aba-bdf2-49fe-b5a2-0a29e8758f63"
 #Specify your API-key number of players per game),
 # mapname, and number of waterstreams/elevations/powerups here
 _api = API(_api_key, 1, "standardmap", 10, 10, 10)
