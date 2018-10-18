@@ -18,26 +18,40 @@ def solution(game_id):
         current_player = state["yourPlayer"]
         current_y_pos = current_player["yPos"]
         current_x_pos = current_player["xPos"]
-        while not state["gameStatus"] == "done":
-            print("Starting turn: " + str(state["turn"]))
-            tiles = state["tileInfo"]
-            print(str(state["yourPlayer"]))
-            current_player = state["yourPlayer"]
-            current_y_pos = current_player["yPos"]
-            current_x_pos = current_player["xPos"]
-            # Take a step in a random direction
-            step_direction_array = ["w", "e", "n", "s"]
-            random_step = random.randint(0, 3)
-            print("Stepped: " + str(step_direction_array[random_step]))
-            response = _api.step(game_id, step_direction_array[random_step])
-            state = response["gameState"]
+        winPos = findWin(tiles)
+        print(winPos)
+        #print(tiles[current_y_pos][current_x_pos])
+        #print(current_x_pos)
+        #print(current_y_pos)
+        
+                # !=  {'type': 'forest'} and tiles[x][y] !=  {'type': 'water'} and tiles[x][y] !=  {'type': 'trail'} and tiles[x][y] !=  {'type': 'road'}):
+        # while not state["gameStatus"] == "done":
+        #     #print("Starting turn: " + str(state["turn"]))
+        #     tiles = state["tileInfo"]
+        #     #print(str(state["yourPlayer"]))
+        #     current_player = state["yourPlayer"]
+        #     current_y_pos = current_player["yPos"]
+        #     current_x_pos = current_player["xPos"]
+        #     # Take a step in a random direction
+        #     step_direction_array = ["w", "e", "n", "s"]
+        #     random_step = random.randint(0, 3)
+        #     #print("Stepped: " + str(step_direction_array[random_step]))
+        #     response = _api.step(game_id, step_direction_array[random_step])
+        #     if response:
+        #         state = response["gameState"]
         print("Finished!")
     else:
         print(initial_state["message"])
 
 
+# for x in range(0,100):
+#             for y in range(0,100):
+#                 if (tiles[x][y]['type'] != 'forest' and tiles[x][y]['type'] != 'road' and tiles[x][y]['type'] != 'water' and tiles[x][y]['type'] != 'trail' and tiles[x][y]['type'] != 'grass' and ):
+#                     print(x,y)
+#                     print(tiles[x][y])
+
 def main():
-    game_id = ""
+    game_id = "9fdefed0-aa5f-4856-87f9-9e17d1cc082c"
     # If no gameID is specified as parameter to the script,
     # Initiate a game with 1 player on the standard map
     if len(sys.argv) == 1:
@@ -51,5 +65,10 @@ def main():
     else:
         game_id = sys.argv[1]
 
+def findWin(graph):
+    for x in range(0,100):
+            for y in range(0,100):
+                if(graph[x][y]['type'] == 'win'):
+                    return (x,y)
 
 main()

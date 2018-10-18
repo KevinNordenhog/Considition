@@ -81,7 +81,7 @@ class API:
     # To be used when joining games with more than one player
     # Returns: The gamestate after all of the players have successfully readied up
     def try_ready_for_game(self, game_id):
-        print('Readying up!');
+        print('Readying up!')
         readied_response = self.ready_up(game_id)
         while readied_response is None:
             print("Trying to ready up")
@@ -154,3 +154,5 @@ class API:
         response = r.json()
         if not response["success"]:
             print(response["message"])
+        else:
+            print("balle")
