@@ -99,7 +99,7 @@ def a_star_search(graph, start, goal):
         
         for next in neighbors(graph, current):
             #if cuurent != forest,water,grass,...
-            
+
             new_cost = cost_so_far[current] + 1#cost(graph, current, next)
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
