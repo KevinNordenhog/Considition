@@ -1,6 +1,8 @@
+# coding=utf-8
 from api import API
 import random
 import sys
+from Queue import *
 
 # TODO : Insert your API-key here
 _api_key = "bdf45aba-bdf2-49fe-b5a2-0a29e8758f63"
@@ -20,6 +22,8 @@ def solution(game_id):
         current_x_pos = current_player["xPos"]
         winPos = findWin(tiles)
         print(winPos)
+        route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
+        print route
         #print(tiles[current_y_pos][current_x_pos])
         #print(current_x_pos)
         #print(current_y_pos)
@@ -61,8 +65,8 @@ def main():
         readied_game = _api.try_ready_for_game(game_id)
         if readied_game is not None:
             print("Joined and readied! Solving...")
-            #solution(game_id)
-            print (_api.get_game(game_id)["gameState"]["tileInfo"])#[0][5])
+            solution(game_id)
+            #print (_api.get_game(game_id)["gameState"]["tileInfo"])#[0][5])
 
     else:
         game_id = sys.argv[1]
@@ -70,7 +74,7 @@ def main():
 def findWin(graph):
     for x in range(0,100):
             for y in range(0,100):
-                if(graph[x][y]['type'] == 'win'):
+                if(graph[y][x]['type'] == 'win'):
                     return (x,y)
 
 def heuristic(a, b):
@@ -80,11 +84,12 @@ def heuristic(a, b):
 
 def a_star_search(graph, start, goal):
     frontier = PriorityQueue()
-    frontier.put(start)#, 0)
+    frontier.put(start, 0)
     came_from = {}
     cost_so_far = {}
     came_from[start] = None
     cost_so_far[start] = 0
+    path = []
     
     while not frontier.empty():
         current = frontier.get()
@@ -93,18 +98,38 @@ def a_star_search(graph, start, goal):
             break
         
         for next in neighbors(graph, current):
+            #if cuurent != forest,water,grass,...
+            
             new_cost = cost_so_far[current] + 1#cost(graph, current, next)
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
                 priority = new_cost + heuristic(goal, next)
                 frontier.put(next, priority)
                 came_from[next] = current
-    
-    return came_from, cost_so_far
+            #print ("{} in {}" .format(next, neighbors(graph, current)))
+
+    temp2 = 1
+    temp = (current)
+    while (current in came_from):
+        temp2 += 1
+        path.append(current)
+        current = came_from[current]
+    #return came_from, cost_so_far
+    print temp2
+    return path
 
 
 def neighbors(graph, current): 
-    return [(graph[current[0]+1][current[1]]), (graph[current[0]-1][current[1]]), (graph[current[0]][current[1]-1]), (graph[current[0]][current[1]+1])]
+    templist = []
+    if ((0 <= (current[0]+1) < 100) and (0 <= (current[1]) < 100)):
+        templist.append(((current[0]+1),(current[1])))
+    if ((0 <= (current[0]-1) < 100) and (0 <= (current[1]) < 100)):
+        templist.append(((current[0]-1),(current[1])))
+    if ((0 <= (current[0]) < 100) and (0 <= (current[1]+1) < 100)):
+        templist.append(((current[0]),(current[1]+1)))
+    if ((0 <= (current[0]) < 100) and (0 <= (current[1]-1) < 100)):
+        templist.append(((current[0]),(current[1]-1)))
+    return templist#[((current[0]+1),(current[1])), ((current[0]-1),(current[1])), ((current[0]),(current[1]-1)), ((current[0]),(current[1]+1))]
 
 
 main()
