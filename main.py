@@ -8,7 +8,8 @@ from Queue import *
 _api_key = "bdf45aba-bdf2-49fe-b5a2-0a29e8758f63"
 # Specify your API-key number of players per game),
 # mapname, and number of waterstreams/elevations/powerups here
-_api = API(_api_key, 1, "standardmap", 10, 10, 10)
+_api = API(_api_key, 1, "trailmap", 10, 10, 10)
+# MAPS: standardmap , watermap , roadmap , trailmap den klarar alla galant! <3
 
 
 # A "solution" that takes a step in a random direction every turn
@@ -68,8 +69,15 @@ def solution(game_id):
             # step_direction_array = ["w", "e", "n", "s"]
             # random_step = random.randint(0, 3)
 
+            # Funktionslista från _api:
+            #     step(self, game_id, direction):
+            #     make_move(self, game_id, direction, speed):
+            #     rest(self, game_id):
+            #     use_powerup(self, game_id, powerup_name):
+            #     drop_powerup(self, game_id, powerup_name):
 
             #print("Stepped: " + str(step_direction_array[random_step]))
+            # make_move(self, game_id, direction, speed): ist för step(self, game_id, direction): för att springa megafort
             response = _api.step(game_id, step_direction)
             if response:
                 state = response["gameState"]
@@ -134,7 +142,7 @@ def a_star_search(graph, start, goal):
                 new_cost = cost_so_far[current] + 1#cost(graph, current, next)
                 if next not in cost_so_far or new_cost < cost_so_far[next]:
                     cost_so_far[next] = new_cost
-                    priority = new_cost #+ heuristic(goal, next) ska denhär vara med ? ? ? ? har ingen aning
+                    priority = new_cost + heuristic(goal, next)# ska denhär heu vara med ? ? ? ? har ingen aning. funkar både med och utan
                     frontier.put(next, priority)
                     came_from[next] = current
                 #print ("{} in {}" .format(next, neighbors(graph, current)))
