@@ -25,24 +25,54 @@ def solution(game_id):
         route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
         print route
         #print(tiles[current_y_pos][current_x_pos])
-        #print(current_x_pos)
-        #print(current_y_pos)
         
-                # !=  {'type': 'forest'} and tiles[x][y] !=  {'type': 'water'} and tiles[x][y] !=  {'type': 'trail'} and tiles[x][y] !=  {'type': 'road'}):
-        # while not state["gameStatus"] == "done":
-        #     #print("Starting turn: " + str(state["turn"]))
-        #     tiles = state["tileInfo"]
-        #     #print(str(state["yourPlayer"]))
-        #     current_player = state["yourPlayer"]
-        #     current_y_pos = current_player["yPos"]
-        #     current_x_pos = current_player["xPos"]
-        #     # Take a step in a random direction
-        #     step_direction_array = ["w", "e", "n", "s"]
-        #     random_step = random.randint(0, 3)
-        #     #print("Stepped: " + str(step_direction_array[random_step]))
-        #     response = _api.step(game_id, step_direction_array[random_step])
-        #     if response:
-        #         state = response["gameState"]
+        # !=  {'type': 'forest'} and tiles[x][y] !=  {'type': 'water'} and tiles[x][y] !=  {'type': 'trail'} and tiles[x][y] !=  {'type': 'road'}):
+        while not state["gameStatus"] == "done":
+            #print("Starting turn: " + str(state["turn"]))
+            tiles = state["tileInfo"]
+            #print(str(state["yourPlayer"]))
+            current_player = state["yourPlayer"]
+            current_y_pos = current_player["yPos"]
+            current_x_pos = current_player["xPos"]
+            current_pos = (current_x_pos,current_y_pos)
+
+            if (current_pos not in route):
+                route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
+                print "whaaaaaaaaaaaat"
+            
+            
+
+            n = neighbors(tiles, current_pos)
+
+            for i in n:
+                if i in route:
+                    next_step = i
+                    print "next {}".format(next_step)
+                    print "curr {}" .format(current_pos)
+            if (next_step[1] == (current_pos[1]-1)):
+                step_direction = "n"
+            elif (next_step[1] == (current_pos[1]+1)):
+                step_direction = "s"
+            elif ((next_step[0]) == current_pos[0]-1):
+                step_direction = "w"
+            elif ((next_step[0]) == current_pos[0]+1):
+                step_direction = "e"
+            else:
+                step_direction_array = ["w", "e", "n", "s"]
+                random_step = random.randint(0, 3)
+                step_direction= step_direction_array[random_step]
+            route.remove(current_pos)
+
+
+            # # Take a step in a random direction
+            # step_direction_array = ["w", "e", "n", "s"]
+            # random_step = random.randint(0, 3)
+
+
+            #print("Stepped: " + str(step_direction_array[random_step]))
+            response = _api.step(game_id, step_direction)
+            if response:
+                state = response["gameState"]
         print("Finished!")
     else:
         print(initial_state["message"])
@@ -77,6 +107,7 @@ def findWin(graph):
                 if(graph[y][x]['type'] == 'win'):
                     return (x,y)
 
+
 def heuristic(a, b):
     (x1, y1) = a
     (x2, y2) = b
@@ -90,37 +121,45 @@ def a_star_search(graph, start, goal):
     came_from[start] = None
     cost_so_far[start] = 0
     path = []
-    
-    while not frontier.empty():
+    booli = True
+    while not (frontier.empty() and booli):
         current = frontier.get()
         
         if current == goal:
             break
         
         for next in neighbors(graph, current):
-            #if cuurent != forest,water,grass,...
-
-            new_cost = cost_so_far[current] + 1#cost(graph, current, next)
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                priority = new_cost + heuristic(goal, next)
-                frontier.put(next, priority)
-                came_from[next] = current
-            #print ("{} in {}" .format(next, neighbors(graph, current)))
+            if((graph[next[1]][next[0]]['type'] == 'water') or (graph[next[1]][next[0]]['type'] == 'road') or (graph[next[1]][next[0]]['type'] == 'trail') or (graph[next[1]][next[0]]['type'] == 'grass') or (graph[next[1]][next[0]]['type'] == 'win')):
+                #print ("{} on {}" .format((graph[next[0]][next[1]]),(next[0],next[1])))
+                new_cost = cost_so_far[current] + 1#cost(graph, current, next)
+                if next not in cost_so_far or new_cost < cost_so_far[next]:
+                    cost_so_far[next] = new_cost
+                    priority = new_cost #+ heuristic(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+                #print ("{} in {}" .format(next, neighbors(graph, current)))
+            
 
     temp2 = 1
-    temp = (current)
-    while (current in came_from):
+    temp = current
+    while (temp in came_from):
         temp2 += 1
-        path.append(current)
-        current = came_from[current]
-    #return came_from, cost_so_far
+        path.append(temp)
+        temp = came_from[temp]
     print temp2
     return path
 
 
 def neighbors(graph, current): 
     templist = []
+    # if ((0 <= (current[0]+1) < 100) and (0 <= (current[1]) < 100)):
+    #     templist.append(((current[0]),(current[1]+1)))
+    # if ((0 <= (current[0]-1) < 100) and (0 <= (current[1]) < 100)):
+    #     templist.append(((current[0]),(current[1]-1)))
+    # if ((0 <= (current[0]) < 100) and (0 <= (current[1]+1) < 100)):
+    #     templist.append(((current[0]+1),(current[1])))    
+    # if ((0 <= (current[0]) < 100) and (0 <= (current[1]-1) < 100)):
+    #     templist.append(((current[0]-1),(current[1])))
     if ((0 <= (current[0]+1) < 100) and (0 <= (current[1]) < 100)):
         templist.append(((current[0]+1),(current[1])))
     if ((0 <= (current[0]-1) < 100) and (0 <= (current[1]) < 100)):
