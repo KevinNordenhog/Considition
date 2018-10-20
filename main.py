@@ -8,7 +8,8 @@ from Queue import *
 _api_key = "bdf45aba-bdf2-49fe-b5a2-0a29e8758f63"
 # Specify your API-key number of players per game),
 # mapname, and number of waterstreams/elevations/powerups here
-_api = API(_api_key, 1, "trailmap", 10, 10, 10)
+_api = API(_api_key, 1, "standardmap", 10, 10, 10)
+# MAPS: ", 10, 10, 10)
 # MAPS: standardmap , watermap , roadmap , trailmap den klarar alla galant! <3
 
 
@@ -26,6 +27,23 @@ def solution(game_id):
         route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
         print route
         #print(tiles[current_y_pos][current_x_pos])
+        print state["yourPlayer"]
+        next_step = ()
+        # print tiles[5][70]
+        # print tiles[7][70]#
+        # print tiles[5][80]
+        # print tiles[8][70]#
+        # print tiles[9][70]#
+        # print tiles[4][80]
+        # print tiles[3][80]
+
+
+
+
+
+
+
+
         
         # !=  {'type': 'forest'} and tiles[x][y] !=  {'type': 'water'} and tiles[x][y] !=  {'type': 'trail'} and tiles[x][y] !=  {'type': 'road'}):
         while not state["gameStatus"] == "done":
@@ -36,33 +54,62 @@ def solution(game_id):
             current_y_pos = current_player["yPos"]
             current_x_pos = current_player["xPos"]
             current_pos = (current_x_pos,current_y_pos)
+            #print current_player
 
-            if (current_pos not in route):
+            # if (current_pos not in route):
+            #     route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
+            #     print "whaaaaaaaaaaaat"
+            # else:
+            #     if next_step in route:
+            #         route.remove(next_step)
+            
+            if (current_pos not in route or next_step in route):
                 route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
-                print "whaaaaaaaaaaaat"
-            
-            
+
+
+            #route = a_star_search(tiles, (current_x_pos,current_y_pos), winPos)
 
             n = neighbors(tiles, current_pos)
 
             for i in n:
                 if i in route:
                     next_step = i
-                    print "next {}".format(next_step)
-                    print "curr {}" .format(current_pos)
+                    # print "next {}".format(next_step)
+                    # print "curr {}" .format(current_pos)
+            
+            #move = True
+            move = False
+            speed = "slow"
             if (next_step[1] == (current_pos[1]-1)):
                 step_direction = "n"
+                if ((next_step[0],next_step[1]-1) in route and (next_step[0],next_step[1]-2) in route):# and (next_step[0],next_step[1]-3) in route):
+                    move = True
+                    if (current_player["stamina"] > 75):
+                        speed = "medium"
             elif (next_step[1] == (current_pos[1]+1)):
                 step_direction = "s"
+                if ((next_step[0],next_step[1]+1) in route and (next_step[0],next_step[1]+2) in route):# and (next_step[0],next_step[1]+3) in route):
+                    move = True
+                    if (current_player["stamina"] > 75):
+                        speed = "medium"
             elif ((next_step[0]) == current_pos[0]-1):
                 step_direction = "w"
+                if ((next_step[0]-1,next_step[1]) in route and (next_step[0]-2,next_step[1]) in route):# and (next_step[0]-3,next_step[1]) in route):
+                    move = True
+                    if (current_player["stamina"] > 75):
+                        speed = "medium"
             elif ((next_step[0]) == current_pos[0]+1):
                 step_direction = "e"
+                if ((next_step[0]+1,next_step[1]) in route and (next_step[0]+2,next_step[1]) in route):# and (next_step[0]+3,next_step[1]) in route):
+                    move = True
+                    if (current_player["stamina"] > 75):
+                        speed = "medium"
             else:
                 step_direction_array = ["w", "e", "n", "s"]
                 random_step = random.randint(0, 3)
                 step_direction= step_direction_array[random_step]
-            route.remove(current_pos)
+            if current_pos in route:
+                route.remove(current_pos)
 
 
             # # Take a step in a random direction
@@ -75,15 +122,21 @@ def solution(game_id):
             #     rest(self, game_id):
             #     use_powerup(self, game_id, powerup_name):
             #     drop_powerup(self, game_id, powerup_name):
+            #current_player:   {u'status': u'swimming', u'playedTurns': 48, u'xPos': 9, u'apiKey': u'bdf45aba-bdf2-49fe-b5a2-0a29e8758f63', u'statusDuration': 0, u'name': u'Sm\xe5l\xe4nska Gubbarna', u'powerupInventory': [u'Cyklop', u'StaminaSale', u'Shoes'], u'lastTurnPlayed': 48, u'yPos': 79, u'stamina': 100, u'activePowerups': [], u'lastTimeActive': u'2018-10-20T10:41:40.0280966+02:00'}
 
             #print("Stepped: " + str(step_direction_array[random_step]))
             # make_move(self, game_id, direction, speed): ist för step(self, game_id, direction): för att springa megafort
-            response = _api.step(game_id, step_direction)
+            if (move):
+                response = _api.make_move(game_id, step_direction, speed)
+            else:
+                response = _api.step(game_id, step_direction)
             if response:
                 state = response["gameState"]
         print("Finished!")
     else:
         print(initial_state["message"])
+        print "FINNNN"
+        return
 
 
 # for x in range(0,100):
